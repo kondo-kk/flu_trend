@@ -10,8 +10,10 @@ from data import create_dataset
 from model import Encoder, Decoder
 import matplotlib.pyplot as plt
 
+
 def calc_metric(pred, target):
     return np.sqrt(np.mean((target - pred)**2)), pearsonr(target.ravel(), pred.ravel())
+
 
 def predict(region):
     np.random.seed(0)
@@ -29,16 +31,22 @@ def predict(region):
     batch_size = 16
     force_teacher = 0.8
 
-    train_dataset, test_dataset, train_max, train_min = create_dataset(input_len, predict_len, region)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    train_dataset, test_dataset, train_max, train_min = create_dataset(
+        input_len, predict_len, region)
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
 
-    enc = Encoder(input_size, encoder_units, input_len, encoder_rnn_layers, encoder_dropout)
-    dec = Decoder(encoder_units*2, decoder_units, input_len, input_len, decoder_dropout, output_size)
+    enc = Encoder(input_size, encoder_units, input_len,
+                  encoder_rnn_layers, encoder_dropout)
+    dec = Decoder(encoder_units*2, decoder_units, input_len,
+                  input_len, decoder_dropout, output_size)
     enc.load_state_dict(torch.load(f"models/{region}_enc.pth"))
     dec.load_state_dict(torch.load(f"models/{region}_dec.pth"))
 
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, drop_last=False)
+    test_loader = DataLoader(test_dataset, batch_size=1,
+                             shuffle=False, drop_last=False)
 
     rmse = 0
     p = 4
@@ -53,7 +61,7 @@ def predict(region):
             h, c = dec.initHidden(1)
             pred = []
             for pi in range(predict_len):
-                x, h, c= dec(x, h, c, enc_vec)
+                x, h, c = dec(x, h, c, enc_vec)
                 pred += [x]
             pred = torch.cat(pred, dim=1)
             predicted += [pred[0, p].item()]
@@ -73,6 +81,8 @@ def predict(region):
     plt.show()
     return f"{region} RMSE {rmse} r {peasonr[0]}"
 
+
 if __name__ == "__main__":
-    regions=["New York", "oregon","Illinois","California", "Texas", "georgia"]
+    regions = ["New York", "oregon", "Illinois",
+               "California", "Texas", "georgia"]
     predict(regions[0])

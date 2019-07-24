@@ -11,17 +11,20 @@ from adabound import AdaBound
 from data import create_dataset
 from model import Encoder, Decoder
 
-in_dir="src/"
-out_dir="output/"
+in_dir = "./"
+out_dir = "./"
+
 
 def quantile_loss(pred, target, gamma=0.8):
     return torch.mean(
-                torch.where(pred > target,
-                            (1 - gamma) * (target-pred)**2,
-                            gamma * (target - pred)**2))
+        torch.where(pred > target,
+                    (1 - gamma) * (target-pred)**2,
+                    gamma * (target - pred)**2))
+
 
 def calc_metric(pred, target):
     return np.sqrt(np.mean((target - pred)**2)), pearsonr(target.ravel(), pred.ravel())
+
 
 def train(region):
     np.random.seed(0)
@@ -40,14 +43,20 @@ def train(region):
     epochs = 500
     force_teacher = 0.8
 
-    train_dataset, test_dataset, train_max, train_min = create_dataset(input_len, predict_len, region)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    train_dataset, test_dataset, train_max, train_min = create_dataset(
+        input_len, predict_len, region)
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
 
-    enc = Encoder(input_size, encoder_units, input_len, encoder_rnn_layers, encoder_dropout)
-    dec = Decoder(encoder_units*2, decoder_units, input_len, input_len, decoder_dropout, output_size)
+    enc = Encoder(input_size, encoder_units, input_len,
+                  encoder_rnn_layers, encoder_dropout)
+    dec = Decoder(encoder_units*2, decoder_units, input_len,
+                  input_len, decoder_dropout, output_size)
 
-    optimizer = AdaBound(list(enc.parameters()) + list(dec.parameters()), 0.01, final_lr=0.1)
+    optimizer = AdaBound(list(enc.parameters()) +
+                         list(dec.parameters()), 0.01, final_lr=0.1)
     # optimizer = optim.Adam(list(enc.parameters()) + list(dec.parameters()), 0.01)
     criterion = nn.MSELoss()
 
@@ -87,20 +96,22 @@ def train(region):
                 x = decoder_input[:, 0]
                 pred = []
                 for pi in range(predict_len):
-                    x, h, c= dec(x, h, c, enc_vec)
+                    x, h, c = dec(x, h, c, enc_vec)
                     pred += [x]
                 pred = torch.cat(pred, dim=1)
             # loss = quantile_loss(pred, target)
             loss = criterion(pred, target)
             test_loss += loss.item()
-        print(f"Epoch {ep} Train Loss {train_loss/len(train_loader)} Test Loss {test_loss/len(test_loader)}")
+        print(
+            f"Epoch {ep} Train Loss {train_loss/len(train_loader)} Test Loss {test_loss/len(test_loader)}")
 
     if not os.path.exists("models"):
         os.mkdir("models")
     torch.save(enc.state_dict(), f"models/{region}_enc.pth")
     torch.save(dec.state_dict(), f"models/{region}_dec.pth")
 
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, drop_last=False)
+    test_loader = DataLoader(test_dataset, batch_size=1,
+                             shuffle=False, drop_last=False)
 
     rmse = 0
     p = 0
@@ -115,15 +126,15 @@ def train(region):
             h, c = dec.initHidden(1)
             pred = []
             for pi in range(predict_len):
-                x, h, c= dec(x, h, c, enc_vec)
+                x, h, c = dec(x, h, c, enc_vec)
                 pred += [x]
             pred = torch.cat(pred, dim=1)
             predicted += [pred[0, p].item()]
             true_target += [target[0, p].item()]
     predicted = np.array(predicted).reshape(1, -1)
-    predicted = predicted  * (train_max - train_min) + train_min
+    predicted = predicted * (train_max - train_min) + train_min
     true_target = np.array(true_target).reshape(1, -1)
-    true_target = true_target  * (train_max - train_min) + train_min
+    true_target = true_target * (train_max - train_min) + train_min
     rmse, peasonr = calc_metric(predicted, true_target)
     print(f"{region} RMSE {rmse}")
     print(f"{region} r {peasonr[0]}")
@@ -131,7 +142,8 @@ def train(region):
 
 
 if __name__ == '__main__':
-    regions=["New York", "oregon","Illinois","California", "Texas", "georgia"]
+    regions = ["New York", "oregon", "Illinois",
+               "California", "Texas", "georgia"]
     results = []
     for i in range(6):
 

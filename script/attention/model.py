@@ -2,14 +2,17 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+
 class Encoder(nn.Module):
     def __init__(self, input_size, rnn_units, seq_len, num_layers, dropout):
         super(Encoder, self).__init__()
-        self.lstm = nn.LSTM(input_size, rnn_units, num_layers, batch_first=True, dropout=dropout, bidirectional=True)
+        self.lstm = nn.LSTM(input_size, rnn_units, num_layers,
+                            batch_first=True, dropout=dropout, bidirectional=True)
 
     def forward(self, x):
         x, _ = self.lstm(x)
         return x
+
 
 class Decoder(nn.Module):
     def __init__(self, input_size, rnn_units, seq_len, num_layers, dropout, output_size):
