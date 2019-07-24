@@ -1,3 +1,4 @@
+# Copyright © 2019 Aidemy inc. All Rights Reserved.
 import pandas as pd
 import numpy as np
 from fastprogress import master_bar, progress_bar
@@ -11,16 +12,11 @@ from adabound import AdaBound
 from data import create_dataset
 from model import Encoder, Decoder
 
-in_dir = "./"
-out_dir = "./"
-
-
 def quantile_loss(pred, target, gamma=0.8):
     return torch.mean(
         torch.where(pred > target,
                     (1 - gamma) * (target-pred)**2,
                     gamma * (target - pred)**2))
-
 
 def calc_metric(pred, target):
     return np.sqrt(np.mean((target - pred)**2)), pearsonr(target.ravel(), pred.ravel())

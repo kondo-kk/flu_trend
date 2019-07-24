@@ -1,3 +1,4 @@
+# Copyright © 2019 Aidemy inc. All Rights Reserved.
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
@@ -10,10 +11,8 @@ from data import create_dataset
 from model import Encoder, Decoder
 import matplotlib.pyplot as plt
 
-
 def calc_metric(pred, target):
     return np.sqrt(np.mean((target - pred)**2)), pearsonr(target.ravel(), pred.ravel())
-
 
 def predict(region):
     np.random.seed(0)

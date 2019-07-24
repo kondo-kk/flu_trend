@@ -1,10 +1,11 @@
+# Copyright © 2019 Aidemy inc. All Rights Reserved.
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset
 
-in_dir = "./"
-out_dir = "./"
+in_dir = "input/"
+out_dir = "models/"
 
 
 def create_encoder_input(dataset, pred_len=1, encoder_input_len=15, rag=1, num_order=0):
@@ -14,8 +15,6 @@ def create_encoder_input(dataset, pred_len=1, encoder_input_len=15, rag=1, num_o
         encoder_input_data += [data]
     encoder_input_data = np.array(encoder_input_data)
     return encoder_input_data
-
-# create_decoder_input
 
 
 def create_decoder_input(dataset, pred_len=1, encoder_input_len=15, rag=1):
@@ -28,9 +27,6 @@ def create_decoder_input(dataset, pred_len=1, encoder_input_len=15, rag=1):
     decoder_input_data = decoder_input_data.reshape(
         decoder_input_data.shape[0], decoder_input_data.shape[1], 1)
     return decoder_input_data
-
-# create_target_data
-
 
 def create_target_data(dataset, pred_len=1, encoder_input_len=15, rag=1):
     target_data = []

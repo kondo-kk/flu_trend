@@ -1,3 +1,4 @@
+# Copyright © 2019 Aidemy inc. All Rights Reserved.
 import torch
 from torch import nn
 import torch.nn.functional as F

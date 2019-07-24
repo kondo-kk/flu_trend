@@ -1,5 +1,4 @@
-
-
+# Copyright © 2019 Aidemy inc. All Rights Reserved.
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import pandas as pd
