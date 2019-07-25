@@ -18,4 +18,5 @@ matplotlib = "*"
 python_version = "3.7"
 
 [scripts]
-start = "python script/attention/train.py"
+train = "python script/attention/train.py"
+predict = "python script/attention/predict.py"
